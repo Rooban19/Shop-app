@@ -1,9 +1,42 @@
+import Product from '../../models/products';
 export const DELETE_PRODUCT = 'DELETE_PRODUCT';
 export const CREATE_PRODUCT = 'CREATE_PRODUCT';
 export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
+export const FETCH_PRODUCT = 'FETCH_PRODUCT';
 
 export const deleteProduct = productId => {
   return { type: DELETE_PRODUCT, pid: productId };
+};
+
+export const fetchProduct = () => {
+  return async dispatch => {
+    try {
+      const response = await fetch(
+        'https://shop-app-react-native-709b8.firebaseio.com/products.jsn',
+      );
+
+      if (!response.ok) {
+        throw new Error('Something went wrong');
+      }
+      const resData = await response.json();
+      const loadedProducts = [];
+      for (const key in resData) {
+        loadedProducts.push(
+          new Product(
+            key,
+            'u1',
+            resData[key].title,
+            resData[key].imageUrl,
+            resData[key].description,
+            resData[key].price,
+          ),
+        );
+      }
+      dispatch({ type: FETCH_PRODUCT, products: loadedProducts });
+    } catch (err) {
+      throw err;
+    }
+  };
 };
 
 export const createProduct = (title, description, imageUrl, price) => {
@@ -29,7 +62,7 @@ export const createProduct = (title, description, imageUrl, price) => {
     dispatch({
       type: CREATE_PRODUCT,
       productData: {
-        id:   resData.name,
+        id: resData.name,
         title,
         description,
         imageUrl,
