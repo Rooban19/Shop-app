@@ -5,14 +5,22 @@ export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 export const FETCH_PRODUCT = 'FETCH_PRODUCT';
 
 export const deleteProduct = productId => {
-  return { type: DELETE_PRODUCT, pid: productId };
+  return async dispatch => {
+    await fetch(
+      `https://shop-app-react-native-709b8.firebaseio.com/products/${productId}.json`,
+      {
+        method: 'DELETE',
+      },
+    );
+    dispatch({ type: DELETE_PRODUCT, pid: productId });
+  };
 };
 
 export const fetchProduct = () => {
   return async dispatch => {
     try {
       const response = await fetch(
-        'https://shop-app-react-native-709b8.firebaseio.com/products.jsn',
+        'https://shop-app-react-native-709b8.firebaseio.com/products.json',
       );
 
       if (!response.ok) {
@@ -58,7 +66,7 @@ export const createProduct = (title, description, imageUrl, price) => {
     );
 
     const resData = await response.json();
-    console.log(resData);
+
     dispatch({
       type: CREATE_PRODUCT,
       productData: {
@@ -73,13 +81,31 @@ export const createProduct = (title, description, imageUrl, price) => {
 };
 
 export const updateProduct = (id, title, description, imageUrl) => {
-  return {
-    type: UPDATE_PRODUCT,
-    pid: id,
-    productData: {
-      title,
-      description,
-      imageUrl,
-    },
+  return async dispatch => {
+    console.log(id);
+    await fetch(
+      `https://shop-app-react-native-709b8.firebaseio.com/products/${id}.json`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          imageUrl,
+        }),
+      },
+    );
+    console.log(title);
+    dispatch({
+      type: UPDATE_PRODUCT,
+      pid: id,
+      productData: {
+        title,
+        description,
+        imageUrl,
+      },
+    });
   };
 };

@@ -21,9 +21,7 @@ const ProductItem = props => {
               <Text style={styles.title}>{props.title}</Text>
               <Text style={styles.price}>${props.price.toFixed(2)}</Text>
             </View>
-            <View style={styles.button}>
-             {props.children}
-            </View>
+            <View style={styles.button}>{props.children}</View>
           </View>
         </TouchableNativeFeedback>
       </View>
