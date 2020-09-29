@@ -1,33 +1,25 @@
 import Product from '../../models/products';
+
 export const DELETE_PRODUCT = 'DELETE_PRODUCT';
 export const CREATE_PRODUCT = 'CREATE_PRODUCT';
 export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
-export const FETCH_PRODUCT = 'FETCH_PRODUCT';
+export const SET_PRODUCTS = 'SET_PRODUCTS';
 
-export const deleteProduct = productId => {
+export const fetchProducts = () => {
   return async dispatch => {
-    await fetch(
-      `https://shop-app-react-native-709b8.firebaseio.com/products/${productId}.json`,
-      {
-        method: 'DELETE',
-      },
-    );
-    dispatch({ type: DELETE_PRODUCT, pid: productId });
-  };
-};
-
-export const fetchProduct = () => {
-  return async dispatch => {
+    // any async code you want!
     try {
       const response = await fetch(
         'https://shop-app-react-native-709b8.firebaseio.com/products.json',
       );
 
       if (!response.ok) {
-        throw new Error('Something went wrong');
+        throw new Error('Something went wrong!');
       }
+
       const resData = await response.json();
       const loadedProducts = [];
+
       for (const key in resData) {
         loadedProducts.push(
           new Product(
@@ -40,15 +32,34 @@ export const fetchProduct = () => {
           ),
         );
       }
-      dispatch({ type: FETCH_PRODUCT, products: loadedProducts });
+
+      dispatch({ type: SET_PRODUCTS, products: loadedProducts });
     } catch (err) {
+      // send to custom analytics server
       throw err;
     }
   };
 };
 
+export const deleteProduct = productId => {
+  return async dispatch => {
+    const response = await fetch(
+      `https://shop-app-react-native-709b8.firebaseio.com/products/${productId}.json`,
+      {
+        method: 'DELETE',
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error('Something went wrong!');
+    }
+    dispatch({ type: DELETE_PRODUCT, pid: productId });
+  };
+};
+
 export const createProduct = (title, description, imageUrl, price) => {
   return async dispatch => {
+    // any async code you want!
     const response = await fetch(
       'https://shop-app-react-native-709b8.firebaseio.com/products.json',
       {
@@ -82,8 +93,7 @@ export const createProduct = (title, description, imageUrl, price) => {
 
 export const updateProduct = (id, title, description, imageUrl) => {
   return async dispatch => {
-    console.log(id);
-    await fetch(
+    const response = await fetch(
       `https://shop-app-react-native-709b8.firebaseio.com/products/${id}.json`,
       {
         method: 'PATCH',
@@ -97,7 +107,11 @@ export const updateProduct = (id, title, description, imageUrl) => {
         }),
       },
     );
-    console.log(title);
+
+    if (!response.ok) {
+      throw new Error('Something went wrong!');
+    }
+
     dispatch({
       type: UPDATE_PRODUCT,
       pid: id,
